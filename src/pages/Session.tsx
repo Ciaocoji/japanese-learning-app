@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { Grade, ReviewRecord } from '../types'
 import { getQuestion, CATEGORY_LABELS } from '../data'
 import { levelById, stageKey } from '../data/levels'
-import { PROGRESSION, type SessionSummary } from '../engine/progress'
+import { PLACEMENT_PASS, PROGRESSION, type SessionSummary } from '../engine/progress'
 import { createStageSession } from '../engine/session'
 import { store, useAppState } from '../state/store'
 import { navigate } from '../state/router'
@@ -310,7 +310,7 @@ function Summary({ summary: s, title, missedIds, onRestart }: { summary: Session
       <Card className="text-center">
         <p className="text-sm text-stone-500">{title}</p>
         <h1 className="mt-1 text-2xl font-bold">
-          {st ? (st.passed ? <Ja>ステージクリア！</Ja> : <Ja>もう少し！</Ja>) : <Ja>おつかれさま！</Ja>}
+          {s.placement ? (s.placement.passed ? <Ja>合格！</Ja> : <Ja>もう少し！</Ja>) : st ? (st.passed ? <Ja>ステージクリア！</Ja> : <Ja>もう少し！</Ja>) : <Ja>おつかれさま！</Ja>}
         </h1>
         <div className="mt-5 grid grid-cols-3 gap-3">
           <div>
@@ -337,6 +337,20 @@ function Summary({ summary: s, title, missedIds, onRestart }: { summary: Session
           </p>
         )}
       </Card>
+
+      {s.placement && (
+        <Card>
+          {s.placement.passed ? (
+            <p className="text-sm">
+              ✅ 跳级测试通过（{s.placement.correct}/{s.placement.total}，要求 ≥ {pct(PLACEMENT_PASS)}）。{s.placement.target} 已解锁，之前的等级全部算作通关。
+            </p>
+          ) : (
+            <p className="text-sm">
+              {s.placement.correct}/{s.placement.total} 题正确，需要 {pct(PLACEMENT_PASS)} 以上才能跳级。答错的题已加入复习。建议从前面的等级开始，或复习后再挑战。
+            </p>
+          )}
+        </Card>
+      )}
 
       {st && (
         <Card>
@@ -381,6 +395,11 @@ function Summary({ summary: s, title, missedIds, onRestart }: { summary: Session
         {nextKey && (
           <Button className="flex-1" onClick={() => start(nextKey)}>
             下一关 →
+          </Button>
+        )}
+        {s.placement?.passed && (
+          <Button className="flex-1" onClick={() => start(stageKey(s.placement!.target, 1))}>
+            开始 {s.placement.target} 第 1 关 →
           </Button>
         )}
         {st && !st.passed && (

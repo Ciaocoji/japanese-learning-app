@@ -158,6 +158,8 @@ export interface StageProgress {
   completed: boolean
   perfect: boolean
   lastPlayed: number
+  /** Marked complete by skipping (button or level test) rather than by playing. */
+  skipped?: boolean
 }
 
 export interface CategoryStat {
@@ -217,7 +219,7 @@ export interface AppState {
 // Sessions
 // ---------------------------------------------------------------------------
 
-export type SessionKind = 'stage' | 'review' | 'daily' | 'practice'
+export type SessionKind = 'stage' | 'review' | 'daily' | 'practice' | 'placement'
 
 export interface SessionPlan {
   kind: SessionKind
@@ -232,6 +234,8 @@ export interface SessionPlan {
   /** Allow one in-session retry of missed review questions. */
   allowRetry: boolean
   retried?: string[]
+  /** Placement (skip) test: the level that unlocks when the test is passed. */
+  placementLevel?: LevelId
 }
 
 export interface SessionAnswer {

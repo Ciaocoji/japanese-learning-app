@@ -7,11 +7,11 @@ export const LEVELS: LevelMeta[] = [
     id: 'N7',
     title: 'はじめの一歩',
     subtitle: '零基础',
-    description: '平假名、片假名、问候语、数字和最基础的词汇。（N7、N6 为本应用自定义等级，非 JLPT 官方等级）',
+    description: '问候与固定用语、数字・量词与购物、中文母语者容易误解的汉字词。（N7、N6 为本应用自定义等级，非 JLPT 官方等级）',
     stages: [
-      { number: 1, title: 'ひらがなとあいさつ', titleZh: '平假名与问候' },
-      { number: 2, title: 'カタカナと数字', titleZh: '片假名与数字' },
-      { number: 3, title: 'はじめての単語', titleZh: '第一批单词' },
+      { number: 1, title: 'あいさつと決まり文句', titleZh: '问候与固定用语' },
+      { number: 2, title: '数字と買い物', titleZh: '数字、量词与购物' },
+      { number: 3, title: '漢字の落とし穴', titleZh: '容易误解的汉字词' },
     ],
   },
   {

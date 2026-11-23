@@ -1,6 +1,7 @@
 import type { AppState, Category, Question, QuestionType, ReviewRecord, SessionPlan } from '../types'
 import { ALL_QUESTIONS, GRAMMAR_CATEGORIES, getQuestion, questionsByStageKey, TYPE_LABELS } from '../data'
-import { levelById, parseStageKey, stageKey } from '../data/levels'
+import { LEVEL_ORDER, levelById, parseStageKey, stageKey } from '../data/levels'
+import type { LevelId } from '../types'
 import { buildReviewQueue, isWeak } from './srs'
 import { currentPosition, isLevelUnlocked, isStageUnlocked } from './progress'
 
@@ -34,7 +35,7 @@ export function buildOptionOrder(ids: string[], rng: Rng = Math.random): Record<
 
 function plan(kind: SessionPlan['kind'], title: string, ids: string[], extra: Partial<SessionPlan> = {}, rng?: Rng): SessionPlan {
   const unique = [...new Set(ids)].filter((id) => getQuestion(id))
-  return { kind, title, questionIds: unique, optionOrder: buildOptionOrder(unique, rng), allowRetry: kind !== 'stage', retried: [], ...extra }
+  return { kind, title, questionIds: unique, optionOrder: buildOptionOrder(unique, rng), allowRetry: kind !== 'stage' && kind !== 'placement', retried: [], ...extra }
 }
 
 export function createStageSession(key: string, rng?: Rng): SessionPlan {
@@ -133,4 +134,23 @@ export function createPracticeSession(state: AppState, type: QuestionType, now: 
 
 export function countPracticeAvailable(state: AppState, type: QuestionType): number {
   return ALL_QUESTIONS.filter((q) => q.type === type && isStageUnlocked(state, q.level, q.stage)).length
+}
+
+export const PLACEMENT_PER_STAGE = 4
+
+/**
+ * Level skip test for unlocking `target`: questions from the level just below it,
+ * the harder ones from each stage. Passing it proves that level (and everything before it).
+ */
+export function createPlacementSession(target: LevelId, rng?: Rng): SessionPlan | null {
+  const idx = LEVEL_ORDER.indexOf(target)
+  if (idx <= 0) return null
+  const source = LEVEL_ORDER[idx - 1]
+  const ids = levelById(source).stages.flatMap((s) =>
+    shuffle(questionsByStageKey(stageKey(source, s.number)), rng)
+      .sort((a, b) => b.difficulty - a.difficulty)
+      .slice(0, PLACEMENT_PER_STAGE)
+      .map((q) => q.id),
+  )
+  return plan('placement', `跳级测试 · ${source} → ${target}`, shuffle(ids, rng), { placementLevel: target }, rng)
 }

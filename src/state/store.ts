@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import type { AppState, Grade, ReviewRecord, SessionAnswer, SessionPlan, Settings } from '../types'
 import { clearState, createInitialState, loadState, saveState, type LoadResult } from '../engine/storage'
-import { applyAnswer, completeSession, regrade, type SessionSummary } from '../engine/progress'
+import { applyAnswer, completeSession, regrade, skipStage, type SessionSummary } from '../engine/progress'
 import { getAudio } from '../audio/audio'
 import { getQuestion } from '../data'
 
@@ -93,6 +93,10 @@ export const store = {
     const { state: next, summary } = completeSession(state, a.session, a.results, now)
     setState(next)
     return summary
+  },
+
+  skipStage(key: string, now = Date.now()) {
+    setState(skipStage(state, key, now))
   },
 
   discardSession() {

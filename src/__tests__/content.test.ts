@@ -77,6 +77,19 @@ describe('content integrity', () => {
     }
   })
 
+  it('N7–N5 stages have at least 15 questions', () => {
+    for (const lvl of ['N7', 'N6', 'N5'])
+      for (const st of [1, 2, 3]) expect(ALL_QUESTIONS.filter((q) => q.level === lvl && q.stage === st).length, `${lvl}-${st}`).toBeGreaterThanOrEqual(15)
+  })
+
+  it('has no romaji-reading drills (kana → latin letters)', () => {
+    const latinOnly = (t: string) => /^[a-z]+$/i.test(t)
+    const bad = ALL_QUESTIONS.filter(
+      (q) => (q.format === 'choice' && q.options.every(latinOnly)) || (q.format === 'match' && q.pairs.every((p) => latinOnly(p.zh))),
+    ).map((q) => q.id)
+    expect(bad).toEqual([])
+  })
+
   it('listening questions have audio text', () => {
     for (const q of ALL_QUESTIONS) if (q.type === 'listening') expect(q.audioText, q.id).toBeTruthy()
   })

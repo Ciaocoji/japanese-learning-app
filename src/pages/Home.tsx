@@ -106,6 +106,18 @@ export function HomePage() {
         </div>
       </Card>
 
+      {rs.learned === 0 && !active && (
+        <Card className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <div className="font-semibold">已经学过日语？</div>
+            <p className="text-sm text-stone-600 dark:text-stone-300">不用从零开始。在「等级」页面做跳级测试，或直接跳过太简单的关卡。</p>
+          </div>
+          <Button variant="secondary" onClick={() => navigate('levels')}>
+            跳级测试
+          </Button>
+        </Card>
+      )}
+
       {/* Review */}
       <Card>
         <SectionTitle ja="復習" zh="复习" right={<button className="text-sm text-indigo-600 hover:underline dark:text-indigo-400" onClick={() => navigate('review')}>详情 →</button>} />

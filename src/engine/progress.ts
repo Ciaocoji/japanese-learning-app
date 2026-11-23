@@ -11,6 +11,9 @@ export const PROGRESSION = {
   minAccuracy: 0.7,
 }
 
+/** Level skip test: share of questions that must be answered correctly. */
+export const PLACEMENT_PASS = 0.8
+
 export const XP = {
   correct: 10,
   /** Correct answer on an item that was neither new nor due (re-practice): small reward only. */
@@ -64,6 +67,32 @@ export function levelProgress(state: AppState, level: LevelId): { done: number; 
   const meta = LEVELS.find((l) => l.id === level)!
   const done = meta.stages.filter((s) => isStageCompleted(state, stageKey(level, s.number))).length
   return { done, total: meta.stages.length }
+}
+
+// ---------------------------------------------------------------------------
+// Skipping
+// ---------------------------------------------------------------------------
+
+function markSkipped(stages: AppState['stages'], key: string, now: number): AppState['stages'] {
+  const prev = stages[key]
+  if (prev?.completed) return stages
+  return { ...stages, [key]: { attempts: prev?.attempts ?? 0, bestAccuracy: prev?.bestAccuracy ?? 0, completed: true, perfect: false, lastPlayed: now, skipped: true } }
+}
+
+/** Skip one unlocked stage: it counts as completed (unlocking the next) but earns no XP. */
+export function skipStage(state: AppState, key: string, now: number): AppState {
+  const { level, stage } = parseStageKey(key)
+  if (!isStageUnlocked(state, level, stage) || isStageCompleted(state, key)) return state
+  return { ...state, stages: markSkipped(state.stages, key, now) }
+}
+
+/** Mark every stage of every level before `level` as completed (used by the level skip test). */
+export function completeLevelsBefore(state: AppState, level: LevelId, now: number): AppState {
+  let stages = state.stages
+  for (const l of LEVELS.slice(0, LEVEL_ORDER.indexOf(level))) {
+    for (const s of l.stages) stages = markSkipped(stages, stageKey(l.id, s.number), now)
+  }
+  return { ...state, stages }
 }
 
 export function rankInfo(xp: number) {
@@ -215,6 +244,7 @@ export interface SessionSummary {
   unlockedLevel?: LevelId
   unlockedStage?: { level: LevelId; stage: number }
   reviewBonus: boolean
+  placement?: { target: LevelId; passed: boolean; accuracy: number; correct: number; total: number }
 }
 
 export function evaluateStage(plan: SessionPlan, results: SessionAnswer[]): StageResult | undefined {
@@ -235,7 +265,7 @@ export function completeSession(state: AppState, plan: SessionPlan, results: Ses
   const correct = firsts.filter((r) => r.correct).length
   const xpEarned = results.reduce((a, r) => a + r.xp, 0)
   let bonus = 0
-  let next = { ...state, activeSession: null }
+  let next: AppState = { ...state, activeSession: null }
   const summary: SessionSummary = {
     answered: firsts.length,
     correct,
@@ -243,6 +273,13 @@ export function completeSession(state: AppState, plan: SessionPlan, results: Ses
     xpEarned,
     bonusXp: 0,
     reviewBonus: false,
+  }
+
+  if (plan.kind === 'placement' && plan.placementLevel) {
+    const total = plan.questionIds.length
+    const passed = firsts.length >= total && correct / total >= PLACEMENT_PASS
+    if (passed) next = completeLevelsBefore(next, plan.placementLevel, now)
+    summary.placement = { target: plan.placementLevel, passed, accuracy: correct / total, correct, total }
   }
 
   const stage = evaluateStage(plan, results)

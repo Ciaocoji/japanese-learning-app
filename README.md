@@ -22,7 +22,7 @@ npm run e2e                                # browser end-to-end flows (needs Pla
 
 ## What's inside
 
-- **7 levels × 3 stages × 10 questions = 210 hand-written questions** (N7, N6 are custom levels, not official JLPT).
+- **255 hand-written questions**: N7–N5 have 15 per stage, N4–N1 have 10 per stage (N7, N6 are custom levels, not official JLPT).
 - **7 learning modes**: vocabulary (choice + matching), fill-in-the-blank, sentence-building puzzle (tap *or* drag),
   conversation gap, situational response, listening (browser TTS), Chinese → Japanese (choice + tiles).
 - **Spaced repetition** (`src/engine/srs.ts`): simplified SM-2. Ladder 1 → 3 → 7 → 14 → 30 days, then × ease.
@@ -31,6 +31,7 @@ npm run e2e                                # browser end-to-end flows (needs Pla
 - **Review queue** prioritised: overdue → recent mistakes → repeated mistakes → low accuracy → due today.
   Max 15 per session; a missed item is re-asked at most once per session.
 - **Weakness analysis** per category, shown only after ≥ 5 answers.
+- **Skipping**: any unlocked stage can be skipped (no XP); a locked level unlocks via a 12-question skip test on the level below (≥ 80 %).
 - **Progression**: stage passes at ≥ 80 % completion and ≥ 70 % first-try accuracy (`PROGRESSION` in `progress.ts`).
   XP for correct answers (reduced for re-practising non-due items), combos, first clear, perfect, review session, daily goal.
 - **Persistence**: versioned LocalStorage with migrations, field-level validation, corrupted-data backup,
