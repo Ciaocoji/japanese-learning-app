@@ -25,7 +25,10 @@ function useTheme() {
   useEffect(() => {
     const mq = window.matchMedia?.('(prefers-color-scheme: dark)')
     const apply = () => {
-      const dark = settings.theme === 'dark' || (settings.theme === 'system' && !!mq?.matches)
+      // A host-provided data-theme (e.g. the artifact viewer) counts as the "system" choice.
+      const host = document.documentElement.getAttribute('data-theme')
+      const systemDark = host ? host === 'dark' : !!mq?.matches
+      const dark = settings.theme === 'dark' || (settings.theme === 'system' && systemDark)
       document.documentElement.classList.toggle('dark', dark)
     }
     apply()

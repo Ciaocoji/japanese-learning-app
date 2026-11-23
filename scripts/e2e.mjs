@@ -98,7 +98,7 @@ await page.screenshot({ path: `${SHOTS}/mobile-home.png`, fullPage: true })
 await noOverflow(page, 'home')
 for (const [route, label] of [['learn', '学習'], ['levels', 'レベル'], ['review', '復習'], ['progress', '進捗']]) {
   await page.locator('nav[aria-label="底部导航"] button', { hasText: label }).click()
-  await page.waitForFunction((r) => location.hash === `#/${r}`, route)
+  await page.waitForFunction((r) => location.hash === `#${r}`, route)
   await noOverflow(page, route)
   await page.screenshot({ path: `${SHOTS}/mobile-${route}.png`, fullPage: true })
 }
@@ -110,7 +110,7 @@ ok(smallTargets === 0, 'bottom nav buttons are ≥44px tall')
 console.log('\n[2] Stage N7-1: one wrong answer, rest correct')
 await page.locator('nav[aria-label="底部导航"] button', { hasText: 'ホーム' }).click()
 await page.getByRole('button', { name: '今日の学習を始める' }).click()
-await page.waitForFunction(() => location.hash === '#/session')
+await page.waitForFunction(() => location.hash === '#session')
 const xp0 = await page.evaluate(() => window.__NQ__.get().xp)
 const first = await current(page)
 ok(first.q.level === 'N7' && first.q.stage === 1, `session starts with N7-1 (${first.id})`)
@@ -183,7 +183,7 @@ ok((await page.evaluate(() => window.__NQ__.get().stages['N7-2']?.completed)) ==
 
 // ---------------------------------------------------------------------------
 console.log('\n[5] Spaced repetition: due items appear in review, intervals change')
-await page.goto(BASE + '#/review')
+await page.goto(BASE + '#review')
 await page.waitForSelector('text=最近的错题')
 ok((await page.locator('text=你的答案：').count()) === 1, 'the one missed question is listed under recent mistakes')
 // Time travel: move every record's schedule 2 days into the past.
@@ -229,7 +229,7 @@ ok((await page.evaluate(() => window.__NQ__.get().records))[r1.id].interval === 
 
 // ---------------------------------------------------------------------------
 console.log('\n[6] Weakness analysis with enough data')
-await page.goto(BASE + '#/progress')
+await page.goto(BASE + '#progress')
 await page.waitForSelector('text=薄弱项分析')
 ok(await page.locator('text=正答率').first().isVisible(), 'category accuracy shown once data exists')
 await page.screenshot({ path: `${SHOTS}/mobile-progress-data.png`, fullPage: true })
@@ -248,7 +248,7 @@ await page.goto(BASE)
 await page.evaluate(() => {
   const s = window.__NQ__
   s.startSession({ kind: 'practice', title: 'listen', questionIds: ['n7-1-07'], optionOrder: { 'n7-1-07': s.question('n7-1-07').options }, allowRetry: false })
-  location.hash = '#/session'
+  location.hash = '#session'
 })
 await page.waitForTimeout(2000)
 const fallbackShown = await page.locator('text=/没有找到日语语音|不支持语音合成/').isVisible()
@@ -288,7 +288,7 @@ await noOverflow(page, 'desktop home')
 await page.evaluate(() => {
   const s = window.__NQ__
   s.startSession({ kind: 'practice', title: 'listen', questionIds: ['n4-3-06'], optionOrder: { 'n4-3-06': s.question('n4-3-06').options }, allowRetry: false })
-  location.hash = '#/session'
+  location.hash = '#session'
 })
 await page.getByRole('button', { name: '播放音频' }).click()
 await page.waitForTimeout(200)
@@ -311,7 +311,7 @@ await page.evaluate(() => {
   s.discardSession()
   const q = s.question('n6-2-08')
   s.startSession({ kind: 'practice', title: 'build', questionIds: ['n6-2-08'], optionOrder: { 'n6-2-08': ['勉強します', '日本語を', '毎日'] }, allowRetry: false })
-  location.hash = '#/session'
+  location.hash = '#session'
   void q
 })
 await page.waitForSelector('button[aria-label="添加「毎日」"]')
@@ -360,7 +360,7 @@ const reset = await browser.newContext({ viewport: { width: 390, height: 844 } }
 page = await reset.newPage()
 await page.goto(BASE)
 await page.evaluate(() => window.__NQ__.replace({ ...window.__NQ__.get(), xp: 500 }))
-await page.goto(BASE + '#/settings')
+await page.goto(BASE + '#prefs')
 await page.getByRole('button', { name: '重置全部学习进度…' }).click()
 ok(await page.getByRole('button', { name: '确认删除' }).isDisabled(), 'delete disabled until confirmation typed')
 await page.getByLabel('输入重置确认').fill('重置')
