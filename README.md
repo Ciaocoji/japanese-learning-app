@@ -22,7 +22,7 @@ npm run e2e                                # browser end-to-end flows (needs Pla
 
 ## What's inside
 
-- **255 hand-written questions**: N7–N5 have 15 per stage, N4–N1 have 10 per stage (N7, N6 are custom levels, not official JLPT).
+- **615 hand-written questions**: N7–N5 have 15 per stage, N4–N1 have 40 per stage (extra sets in `*-extra.ts`, written with the compact helpers in `src/data/compact.ts`) (N7, N6 are custom levels, not official JLPT).
 - **7 learning modes**: vocabulary (choice + matching), fill-in-the-blank, sentence-building puzzle (tap *or* drag),
   conversation gap, situational response, listening (browser TTS), Chinese → Japanese (choice + tiles).
 - **Spaced repetition** (`src/engine/srs.ts`): simplified SM-2. Ladder 1 → 3 → 7 → 14 → 30 days, then × ease.

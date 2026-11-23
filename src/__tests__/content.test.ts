@@ -82,6 +82,11 @@ describe('content integrity', () => {
       for (const st of [1, 2, 3]) expect(ALL_QUESTIONS.filter((q) => q.level === lvl && q.stage === st).length, `${lvl}-${st}`).toBeGreaterThanOrEqual(15)
   })
 
+  it('N4–N1 stages have at least 40 questions', () => {
+    for (const lvl of ['N4', 'N3', 'N2', 'N1'])
+      for (const st of [1, 2, 3]) expect(ALL_QUESTIONS.filter((q) => q.level === lvl && q.stage === st).length, `${lvl}-${st}`).toBeGreaterThanOrEqual(40)
+  })
+
   it('has no romaji-reading drills (kana → latin letters)', () => {
     const latinOnly = (t: string) => /^[a-z]+$/i.test(t)
     const bad = ALL_QUESTIONS.filter(

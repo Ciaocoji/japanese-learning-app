@@ -6,9 +6,13 @@ import { n4 } from './content/n4'
 import { n3 } from './content/n3'
 import { n2 } from './content/n2'
 import { n1 } from './content/n1'
+import { n4Extra } from './content/n4-extra'
+import { n3Extra } from './content/n3-extra'
+import { n2Extra } from './content/n2-extra'
+import { n1Extra } from './content/n1-extra'
 import { stageKey } from './levels'
 
-export const ALL_QUESTIONS: Question[] = [...n7, ...n6, ...n5, ...n4, ...n3, ...n2, ...n1]
+export const ALL_QUESTIONS: Question[] = [...n7, ...n6, ...n5, ...n4, ...n4Extra, ...n3, ...n3Extra, ...n2, ...n2Extra, ...n1, ...n1Extra]
 
 export const QUESTION_MAP: Map<string, Question> = new Map(ALL_QUESTIONS.map((q) => [q.id, q]))
 
